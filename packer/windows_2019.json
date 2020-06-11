@@ -40,7 +40,9 @@
         {
             "type": "windows-shell",
             "inline": [
-                "dir c:\\"
+                 "dism /online /Cleanup-Image /StartComponentCleanup /ResetBase",
+                 "dism /online /Cleanup-Image /SPSuperseded",
+                 "sysprep /generalize /oobe /unattend:a://answerfile.xml"
             ]
         }
     ]
