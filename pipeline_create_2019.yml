@@ -13,6 +13,7 @@ resource_types:
 
 resources:
 - name: build-vsphere-2019
+  icon: server-plus
   tags: ((tags))
   type: packer
 
