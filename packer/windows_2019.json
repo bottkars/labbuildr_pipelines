@@ -39,6 +39,12 @@
     ],
     "provisioners": [
         {
+            "type": "powershell",
+            "inline":[
+                "Start-WUScan | Install-WUUpdates"
+            ]
+        },
+        {
             "type": "windows-shell",
             "inline": [
                  "dism /online /Cleanup-Image /StartComponentCleanup /ResetBase",
