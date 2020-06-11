@@ -8,14 +8,14 @@
             "insecure_connection": "true",
             "vm_name": "{{user `vm_name`}}",
             "host": "{{user `host`}}",
-            "resource_pool": "{{user `pool`}}",
+            "resource_pool": "{{user `resource_pool`}}",
             "datastore": "{{user `datastore`}}",
             "guest_os_type": "windows9Server64Guest",
             "communicator": "winrm",
             "winrm_username": "winrm",
             "winrm_password": "winrm",
-            "CPUs": 1,
-            "RAM": 4096,
+            "CPUs": 2,
+            "RAM": 8192,
             "RAM_reserve_all": true,
             "disk_controller_type": "pvscsi",
             "disk_size": 32768,
@@ -31,9 +31,9 @@
                 "{{user `tools_iso`}}"
             ],
             "floppy_files": [
-                "{{template_dir}}/setup/"
-            ],
-            "floppy_img_path": "[ISO] VMware-Tools-windows-11.0.5-15389592/floppies/pvscsi-Windows8.flp"
+                "{{template_dir}}/packer/scripts/2019",
+                "{{template_dir}}/packer/answerfiles/2019"            ],
+            "floppy_img_path": "{{user `floppy_img`}}"
         }
     ],
     "provisioners": [
