@@ -18,7 +18,7 @@ resources:
 
 - name: labbuildr-pipelines
   tags: ((tags))
-  icon: github-circle
+  icon: github
   type: git  
   source: 
     uri: https://github.com/bottkars/labbuildr_pipelines.git
