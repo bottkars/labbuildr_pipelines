@@ -42,7 +42,7 @@
             "inline": [
                  "dism /online /Cleanup-Image /StartComponentCleanup /ResetBase",
                  "dism /online /Cleanup-Image /SPSuperseded",
-                 "sysprep /generalize /oobe /unattend:a://answerfile.xml"
+                 "C:/windows/system32/sysprep/sysprep.exe /generalize /oobe /unattend:a://answerfile.xml"
             ]
         }
     ]
