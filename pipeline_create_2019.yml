@@ -1,0 +1,54 @@
+s3_env: &s3_env
+  access_key_id: ((((foundation))/s3_access_key_id))
+  endpoint:  ((((foundation))/s3_endpoint))
+  region_name: ((((foundation))/s3_region_name))
+  secret_access_key: ((((foundation))/s3_secret_access_key))
+
+resource_types:
+- name: packer
+  type: docker-image
+  source:
+    repository: snapkitchen/concourse-packer-resource
+    tag: 1.5.4
+
+resources:
+- name: build-vsphere-2019-core
+  tags: ((tags))
+  type: packer
+
+- name: labbuildr-pipelines
+  tags: ((tags))
+  icon: github-circle
+  type: git  
+  source: 
+    uri: https://github.com/bottkars/labbuildr-pipelines.git
+    branch: master
+
+#- name: windows-template
+#  tags: ((tags))
+#  icon: amazon-drive
+#  type: s3
+#  source:
+#    <<: *s3_env
+#    bucket: ((buckets.packer_resource))
+#    regexp: packer/windows(.*).json
+jobs:
+- name: build-vsphere
+  plan:
+  - get: labbuildr-pipelines
+  #  - get: role-credentials
+  - put: build-vsphere-2019-iso
+    params:
+      template: labbuildr-pipelines/packer/windows_2019.json
+      vars:
+        vcenter_server: ((GOVC.URL))
+        username: ((GOVC.USERNAME))
+        password: ((GOVC.PASSWORD))
+        vm_name: 2019_template
+        host: esxi-mgmt.home.labbuildr.com
+        resource_pool: mgmt_pool
+        datastore: QNAP_DS1
+        network: "DPortGroup VM Network"
+        win_iso: "[ISO] 17763.379.190312-0539.rs5_release_svc_refresh_SERVER_EVAL_x64FRE_en-us.iso",
+        tools_iso: "[ISO] VMware-Tools-windows-11.0.5-15389592/vmtools/windows.iso"
+
