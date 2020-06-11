@@ -14,6 +14,7 @@
             "communicator": "winrm",
             "winrm_username": "administrator",
             "winrm_password": "packer",
+            "shutdown_command": "C:/windows/system32/sysprep/sysprep.exe /generalize /oobe /unattend:a://answerfile.xml",
             "CPUs": 2,
             "RAM": 8192,
             "RAM_reserve_all": true,
@@ -41,8 +42,7 @@
             "type": "windows-shell",
             "inline": [
                  "dism /online /Cleanup-Image /StartComponentCleanup /ResetBase",
-                 "dism /online /Cleanup-Image /SPSuperseded",
-                 "C:/windows/system32/sysprep/sysprep.exe /generalize /oobe /unattend:a://answerfile.xml"
+                 "dism /online /Cleanup-Image /SPSuperseded"
             ]
         }
     ]
