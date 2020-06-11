@@ -12,7 +12,7 @@ resource_types:
     tag: 1.5.4
 
 resources:
-- name: build-vsphere-2019-core
+- name: build-vsphere-2019
   tags: ((tags))
   type: packer
 
@@ -21,14 +21,14 @@ resources:
   icon: github-circle
   type: git  
   source: 
-    uri: https://github.com/bottkars/labbuildr-pipelines.git
+    uri: https://github.com/bottkars/labbuildr_pipelines.git
     branch: master
 
 jobs:
 - name: build-vsphere
   plan:
   - get: labbuildr-pipelines
-  - put: build-vsphere-2019-iso
+  - put: build-vsphere-2019
     params:
       template: labbuildr-pipelines/packer/windows_2019.json
       vars:

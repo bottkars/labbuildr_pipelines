@@ -31,8 +31,8 @@
                 "{{user `tools_iso`}}"
             ],
             "floppy_files": [
-                "{{template_dir}}/packer/scripts/2019",
-                "{{template_dir}}/packer/answerfiles/2019"            ],
+                "{{template_dir}}/scripts/2019",
+                "{{template_dir}}/answerfiles/2019"            ],
             "floppy_img_path": "{{user `floppy_img`}}"
         }
     ],
