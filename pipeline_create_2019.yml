@@ -24,19 +24,10 @@ resources:
     uri: https://github.com/bottkars/labbuildr-pipelines.git
     branch: master
 
-#- name: windows-template
-#  tags: ((tags))
-#  icon: amazon-drive
-#  type: s3
-#  source:
-#    <<: *s3_env
-#    bucket: ((buckets.packer_resource))
-#    regexp: packer/windows(.*).json
 jobs:
 - name: build-vsphere
   plan:
   - get: labbuildr-pipelines
-  #  - get: role-credentials
   - put: build-vsphere-2019-iso
     params:
       template: labbuildr-pipelines/packer/windows_2019.json
@@ -48,7 +39,7 @@ jobs:
         host: esxi-mgmt.home.labbuildr.com
         resource_pool: mgmt_pool
         datastore: QNAP_DS1
-        network: "DPortGroup VM Network"
-        win_iso: "[ISO] 17763.379.190312-0539.rs5_release_svc_refresh_SERVER_EVAL_x64FRE_en-us.iso",
-        tools_iso: "[ISO] VMware-Tools-windows-11.0.5-15389592/vmtools/windows.iso"
-        floppy_img: "[ISO] VMware-Tools-windows-11.0.5-15389592/floppies/pvscsi-Windows8.flp"
+        network: DPortGroup VM Network
+        win_iso: '[ISO] 17763.379.190312-0539.rs5_release_svc_refresh_SERVER_EVAL_x64FRE_en-us.iso'
+        tools_iso: '[ISO] VMware-Tools-windows-11.0.5-15389592/vmtools/windows.iso'
+        floppy_img: '[ISO] VMware-Tools-windows-11.0.5-15389592/floppies/pvscsi-Windows8.flp'
