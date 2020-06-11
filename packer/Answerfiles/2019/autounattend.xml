@@ -123,6 +123,15 @@
         <component name="Microsoft-Windows-Shell-Setup" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS" xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
             <TimeZone>GMT Standard Time</TimeZone>
         </component>
+        <component name="Microsoft-Windows-Deployment" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS" xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+            <RunSynchronous>
+                <RunSynchronousCommand wcm:action="add">
+                    <Order>1</Order>
+                    <Description>Disable Network Discovery</Description>
+                    <Path>cmd.exe /c a:\disable-network-discovery.cmd</Path>
+                </RunSynchronousCommand>
+            </RunSynchronous>
+        </component>        
     </settings>    
     <settings pass="oobeSystem">
         <component name="Microsoft-Windows-Shell-Setup" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS" 
@@ -146,10 +155,16 @@
                 </SynchronousCommand>
                 <SynchronousCommand wcm:action="add">
                     <Order>2</Order>
-                    <Description>Set Execution Policy 64 Bit</Description>
+                    <Description>Install VMware Tools</Description>
                     <CommandLine>cmd.exe /c e:\setup64 /s /v "/qb REBOOT=R"</CommandLine>
                     <RequiresUserInput>true</RequiresUserInput>
-                </SynchronousCommand>                
+                </SynchronousCommand> 
+                <SynchronousCommand wcm:action="add">
+                    <Order>3</Order>
+                    <Description>Disable WinRM</Description>
+                    <CommandLine>C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe -File a:\disable-winrm.ps1</CommandLine>
+                    <RequiresUserInput>true</RequiresUserInput>
+                </SynchronousCommand>                               
             </FirstLogonCommands>
             
             <OOBE>
