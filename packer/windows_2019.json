@@ -14,7 +14,7 @@
             "communicator": "winrm",
             "winrm_username": "administrator",
             "winrm_password": "packer",
-            "shutdown_command": "C:/windows/system32/sysprep/sysprep.exe /generalize /oobe /unattend:a://answerfile.xml",
+            "shutdown_command": "C:/windows/system32/sysprep/sysprep.exe /generalize /oobe /shutdown /unattend:a://answerfile.xml",
             "CPUs": 2,
             "RAM": 8192,
             "RAM_reserve_all": true,
