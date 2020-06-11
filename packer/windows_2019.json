@@ -41,7 +41,7 @@
         {
             "type": "powershell",
             "inline":[
-                "Start-WUScan | Install-WUUpdates"
+                "Install-WUUpdates -Updates (Start-WUScan)"
             ]
         },
         {
