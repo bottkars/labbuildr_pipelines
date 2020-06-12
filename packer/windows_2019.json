@@ -42,7 +42,6 @@
         }
     ],
     "provisioners": [
-
         {
             "type": "windows-restart"
         },
