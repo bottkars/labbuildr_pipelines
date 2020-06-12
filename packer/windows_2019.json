@@ -42,15 +42,9 @@
         }
     ],
     "provisioners": [
+
         {
             "type": "windows-restart"
-        },
-        {
-            "type": "windows-shell",
-            "inline": [
-                 "dism /online /Cleanup-Image /StartComponentCleanup /ResetBase",
-                 "dism /online /Cleanup-Image /SPSuperseded"
-            ]
         }
     ]
 }
