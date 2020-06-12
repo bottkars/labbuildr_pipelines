@@ -1,6 +1,7 @@
 {
     "builders": [
         {
+            "name": "{{user `build_name`}}",    
             "type": "vsphere-iso",
             "vcenter_server": "{{user `vcenter_server`}}",
             "username": "{{user `username`}}",
@@ -39,6 +40,7 @@
     ],
     "provisioners": [
         {
+            "only": ["vsphere-update-build"],
             "type": "powershell",
             "inline":[
                 "Install-WUUpdates -Updates (Start-WUScan)"

@@ -33,6 +33,7 @@ jobs:
     params:
       template: labbuildr-pipelines/packer/windows_2019.json
       vars:
+        builder_name: vsphere-iso-build #vsphere-update-build
         vcenter_server: ((GOVC.URL))
         username: ((GOVC.USERNAME))
         password: ((GOVC.PASSWORD))
