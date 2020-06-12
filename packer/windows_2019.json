@@ -1,6 +1,8 @@
 {
     "builders": [
         {
+            "winrm_timeout": "1h",
+            "shutdown_timeout": "1h",
             "name": "{{user `builder_name`}}",    
             "type": "vsphere-iso",
             "vcenter_server": "{{user `vcenter_server`}}",
