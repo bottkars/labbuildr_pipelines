@@ -1,7 +1,7 @@
 {
     "builders": [
         {
-            "name": "{{user `build_name`}}",    
+            "name": "{{user `builder_name`}}",    
             "type": "vsphere-iso",
             "vcenter_server": "{{user `vcenter_server`}}",
             "username": "{{user `username`}}",
