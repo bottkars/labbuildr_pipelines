@@ -40,16 +40,6 @@
     ],
     "provisioners": [
         {
-            "only": ["vsphere-update-build"],
-            "type": "powershell",
-            "inline":[
-                "Install-WUUpdates -Updates (Start-WUScan)"
-            ]
-        },
-        {
-            "type": "windows-restart"
-        },
-        {
             "type": "windows-shell",
             "inline": [
                  "dism /online /Cleanup-Image /StartComponentCleanup /ResetBase",
