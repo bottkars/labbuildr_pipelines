@@ -42,9 +42,15 @@
         }
     ],
     "provisioners": [
-
+        {
+            "type": "powershell",
+            "inline":[
+                "Install-WUUpdates -Updates (Start-WUScan)"
+            ]
+        },
         {
             "type": "windows-restart"
         }
+
     ]
 }
