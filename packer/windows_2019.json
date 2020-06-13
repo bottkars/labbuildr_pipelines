@@ -58,6 +58,7 @@
             ]
         },
         {
+            "type": "powershell",
             "inline": [
                 "if (Get-WUIsPendingReboot) {write-host 'pending reboot<==';Restart-Computer -Force} else {Write-Host '==>No Reboot Required<=='}"
             ]
