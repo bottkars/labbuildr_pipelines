@@ -38,7 +38,8 @@
                 "{{template_dir}}/scripts/2019",
                 "{{template_dir}}/answerfiles/2019"
             ],
-            "floppy_img_path": "{{user `floppy_img`}}"
+            "floppy_img_path": "{{user `floppy_img`}}",
+            "convert_to_template": true
         }
     ],
     "provisioners": [
