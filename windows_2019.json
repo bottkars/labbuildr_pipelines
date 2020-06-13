@@ -17,7 +17,7 @@
             "communicator": "winrm",
             "winrm_username": "administrator",
             "winrm_password": "packer",
-            "disable_shutdown": "true",
+            "shutdown_command": "C:/Windows/System32/WindowsPowerShell/v1.0/powershell.exe -File a:/sysprep.ps1",
             "CPUs": 2,
             "RAM": 8192,
             "RAM_reserve_all": true,
