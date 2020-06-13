@@ -49,7 +49,7 @@
                 "Write-Host '==> Latest Update Date is' $(Get-WULastInstallationDate)",
                 "Write-Host '==> Scanning for Updates'",
                 "$Updates=Start-WUScan",
-                "if ($Updates) {Install-WUUpdates -updates $Updates -verbose } else {Write-Host '==> no pending updates'}",
+                "if ($Updates) {Write-Host '==> Installing Updates'; Install-WUUpdates -updates $Updates -verbose } else {Write-Host '==> no pending updates'}",
                 "if (Get-WUIsPendingReboot) {write-host 'pending reboot<==';Restart-computer -Force} else {Write-Host '==>No Reboot Required<=='}"
 
             ]
