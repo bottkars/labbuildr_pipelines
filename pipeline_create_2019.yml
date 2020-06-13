@@ -44,5 +44,5 @@ jobs:
         datastore: QNAP_DS1
         network: DPortGroup VM Network
         win_iso: '[ISO] 17763.379.190312-0539.rs5_release_svc_refresh_SERVER_EVAL_x64FRE_en-us.iso'
-        tools_iso: '[ISO] VMware-Tools-windows-11.0.5-15389592/vmtools/windows.iso'
-        floppy_img: '[ISO] VMware-Tools-windows-11.0.5-15389592/floppies/pvscsi-Windows8.flp'
+        tools_iso: '[ISO] VMware-Tools-windows-11.1.0-16036546/vmtools/windows.iso'
+        floppy_img: '[ISO] VMware-Tools-windows-11.1.0-16036546/floppies/pvscsi-Windows8.flp'
