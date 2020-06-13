@@ -17,7 +17,7 @@
             "communicator": "winrm",
             "winrm_username": "administrator",
             "winrm_password": "packer",
-            "shutdown_command": "C:/windows/system32/sysprep/sysprep.exe /generalize /oobe /shutdown /unattend:a://answerfile.xml",
+            "shutdown_command": "C:/Windows/System32/WindowsPowerShell/v1.0/powershell.exe -File a:/sysprep.ps1",
             "CPUs": 2,
             "RAM": 8192,
             "RAM_reserve_all": true,
@@ -45,14 +45,23 @@
         {
             "type": "powershell",
             "inline":[
-                "Install-WUUpdates -Updates (Start-WUScan)"
+                "$Updates=Start-WUScan",
+                "if ($Updates) {Install-WUUpdates -updates $Updates} else {Write-Host '==> no pending updates'}",
+                "if (Get-WUIsPendingReboot) {write-host 'pending reboot<==';Restart-computer -Force} else {Write-Host '==>No Reboot Required<=='}"
+
             ]
         },
         {
-            "type": "windows-restart"
+            "type": "powershell",
+            "inline": [
+                "if (Get-WUIsPendingReboot) {write-host 'pending reboot<==';Restart-Computer -Force} else {Write-Host '==>No Reboot Required<=='}"
+            ]
         },
         {
-            "type": "windows-restart"
+            "inline": [
+                "if (Get-WUIsPendingReboot) {write-host 'pending reboot<==';Restart-Computer -Force} else {Write-Host '==>No Reboot Required<=='}"
+            ]
+
         }
     ]
 }
