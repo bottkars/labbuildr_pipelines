@@ -46,7 +46,7 @@
             "type": "powershell",
             "inline":[
                 "Write-Host '==> Latest Update is' $(Get-WUAVersion)",
-                "Write-Host '==> Latest Update Date is'Get-WULastInstallationDate",
+                "Write-Host '==> Latest Update Date is' $(Get-WULastInstallationDate)",
                 "Write-Host '==> Scanning for Updates'",
                 "$Updates=Start-WUScan",
                 "if ($Updates) {Install-WUUpdates -updates $Updates -verbose } else {Write-Host '==> no pending updates'}",
@@ -58,7 +58,7 @@
             "type": "powershell",
             "inline": [
                 "Write-Host '==> Latest Update is' $(Get-WUAVersion)",
-                "Write-Host '==> Latest Update Date is'Get-WULastInstallationDate",
+                "Write-Host '==> Latest Update Date is' $(Get-WULastInstallationDate)",
                 "if (Get-WUIsPendingReboot) {write-host 'pending reboot<==';Restart-Computer -Force} else {Write-Host '==>No Reboot Required<=='}"
             ]
         },
