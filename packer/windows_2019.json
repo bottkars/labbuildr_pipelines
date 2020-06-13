@@ -17,7 +17,7 @@
             "communicator": "winrm",
             "winrm_username": "administrator",
             "winrm_password": "packer",
-            "disable_shutdown": true,
+            "shutdown_command": "Start-Process 'c:/windows/system32/sysprep/sysprep.exe' -ArgumentList '/generalize /oobe /shutdown /unattend:a:/answerfile.xml' -Verb 'RunAs -WindowStyle Normal -PassThru",
             "CPUs": 2,
             "RAM": 8192,
             "RAM_reserve_all": true,
@@ -67,13 +67,6 @@
                 "if (Get-WUIsPendingReboot) {write-host 'pending reboot<==';Restart-Computer -Force} else {Write-Host '==>No Reboot Required<=='}"
             ]
 
-        },
-        {
-            "type": "powershell",
-            "inline": [
-                "Start-Process 'c:/windows/system32/sysprep/sysprep.exe' -ArgumentList '/generalize /oobe /shutdown /unattend:a:/answerfile.xml' -Verb 'RunAs'  -WindowStyle Normal -PassThru"
-            ]
-
-        }        
+        }
     ]
 }
