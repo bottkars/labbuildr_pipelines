@@ -1,0 +1,74 @@
+vsphere_env: &vsphere_env
+  GOVC_INSECURE: ((GOVC.INSECURE))
+  GOVC_PASSWORD: ((GOVC.PASSWORD))
+  GOVC_URL: ((GOVC.URL))
+  GOVC_USERNAME: ((GOVC.USERNAME))
+  GOVC_RESOURCE_POOL: ((GOVC.RESOURCE_POOL))
+  GOVC_DATASTORE: ((GOVC.DATASTORE)) 
+  GOVC_DATACENTER: ((GOVC.DATACENTER)) 
+  GOVC_NETWORK: ((GOVC.NETWORK))
+  LABBUILDR_RESOURCE_POOL: ((LABBUILDR.LAB1.RESOURCE_POOL))
+  LABBUILD_DATASTORE: ((LABBUILDR.LAB1.DATASTORE)) 
+  LABBUILD_DATACENTER: ((LABBUILDR.LAB1.DATACENTER)
+  LABBUILDR_NETWORK: ((LABBUILDR.LAB1.NETWORK))
+  LABBUILDR_ADDRESS: ((LABBUILDR.LAB1.ADDRESS))
+  LABBUILDR_GATEWAY: ((LABBUILDR.LAB1.GATEWAY))
+  LABBUILDR_NETMASK: ((LABBUILDR.LAB1.NETMASK))
+  LABBUILDR_FQDN: ((LABBUILDR.LAB1.FQDN))
+  LABBUILDR_VMNAME: ((LABBUILDR.LAB1.VMNAME))
+  LABBUILDR_DNS: ((LABBUILDR.LAB1.DNS))
+
+  
+s3_env: &s3_env
+  access_key_id: ((((foundation))/s3_access_key_id))
+  endpoint:  ((((foundation))/s3_endpoint))
+  region_name: ((((foundation))/s3_region_name))
+  secret_access_key: ((((foundation))/s3_secret_access_key))
+
+resource_types:
+- name: pivnet
+  type: docker-image
+  source:
+    repository: pivotalcf/pivnet-resource
+    tag: latest-final
+   
+resources:
+
+- name: dps-automation-image
+  icon: amazon-drive
+  type: s3
+  source:
+    <<: *s3_env
+    bucket: ((buckets.pivnet_image))
+    regexp: platform-automation-image-(.*).tgz
+
+
+- name: labbuildr-concourse-tasks
+  tags: ((tags))
+  icon: git
+  type: git
+  check_every: 10m  
+  source:  
+    uri: https://github.com/bottkars/labbuildr-concourse-tasks.git
+    branch: master
+
+jobs:
+
+- name: deploy-dc
+  plan:
+  - in_parallel:
+    - get: dps-automation-image
+      params:
+        unpack: true
+      tags: ((tags))        
+    - get: labbuildr-concourse-tasks
+      tags: ((tags))
+  - task: clone-node
+    tags: ((tags))
+    image: dps-automation-image
+    file: labbuildr-concourse-tasks/vsphere/tasks/clone-node.yml
+    input_mapping:
+      labbuildr-concourse-tasks: labbuildr-concourse-tasks
+    params:
+      <<: *vsphere_env
+  
