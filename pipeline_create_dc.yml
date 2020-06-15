@@ -8,15 +8,15 @@ vsphere_env: &vsphere_env
   GOVC_DATACENTER: ((GOVC.DATACENTER)) 
   GOVC_NETWORK: ((GOVC.NETWORK))
   LABBUILDR_RESOURCE_POOL: ((LABBUILDR.LAB1.RESOURCE_POOL))
-  LABBUILD_DATASTORE: ((LABBUILDR.LAB1.DATASTORE)) 
-  LABBUILD_DATACENTER: ((LABBUILDR.LAB1.DATACENTER)
+  LABBUILDR_DATASTORE: ((LABBUILDR.LAB1.DATASTORE)) 
+  LABBUILDR_DATACENTER: ((LABBUILDR.LAB1.DATACENTER))
   LABBUILDR_NETWORK: ((LABBUILDR.LAB1.NETWORK))
   LABBUILDR_ADDRESS: ((LABBUILDR.LAB1.ADDRESS))
   LABBUILDR_GATEWAY: ((LABBUILDR.LAB1.GATEWAY))
   LABBUILDR_NETMASK: ((LABBUILDR.LAB1.NETMASK))
   LABBUILDR_FQDN: ((LABBUILDR.LAB1.FQDN))
-  LABBUILDR_VMNAME: ((LABBUILDR.LAB1.VMNAME))
   LABBUILDR_DNS: ((LABBUILDR.LAB1.DNS))
+  LABBUILDR_VM_FOLDER: ((LABBUILDR.LAB1.VM_FOLDER))
 
   
 s3_env: &s3_env
@@ -35,7 +35,8 @@ resource_types:
 resources:
 
 - name: dps-automation-image
-  icon: amazon-drive
+  icon: cloud-download
+  tags: ((tags))      
   type: s3
   source:
     <<: *s3_env
@@ -43,6 +44,14 @@ resources:
     regexp: platform-automation-image-(.*).tgz
 
 
+- name: labbuildr-scripts
+  tags: ((tags))
+  icon: git
+  type: git
+  check_every: 10m  
+  source:  
+    uri: https://github.com/bottkars/labbuildr-scripts.git
+    branch: labbuildr_2020
 - name: labbuildr-concourse-tasks
   tags: ((tags))
   icon: git
@@ -63,6 +72,8 @@ jobs:
       tags: ((tags))        
     - get: labbuildr-concourse-tasks
       tags: ((tags))
+    - get: labbuildr-scripts
+      tags: ((tags))      
   - task: clone-node
     tags: ((tags))
     image: dps-automation-image
@@ -71,4 +82,38 @@ jobs:
       labbuildr-concourse-tasks: labbuildr-concourse-tasks
     params:
       <<: *vsphere_env
-  
+      LABBUILDR_VM_NAME: dcnode
+      LABBUILDR_VM_MEMORY: 4096
+      LABBUILDR_VM_CPU: 2
+  - task: configure-node
+    tags: ((tags))
+    image: dps-automation-image
+    file: labbuildr-concourse-tasks/vsphere/tasks/clone-node.yml
+    input_mapping:
+      labbuildr-concourse-tasks: labbuildr-concourse-tasks      
+
+- name: configure-dc
+  plan:
+  - in_parallel:
+    - get: dps-automation-image
+      params:
+        unpack: true
+      tags: ((tags))        
+    - get: labbuildr-concourse-tasks
+      tags: ((tags))
+    - get: labbuildr-scripts
+      tags: ((tags))      
+  - task: configure-node
+    tags: ((tags))
+    image: dps-automation-image
+    file: labbuildr-concourse-tasks/vsphere/tasks/configure-dcnode.yml
+    input_mapping:
+      labbuildr-concourse-tasks: labbuildr-concourse-tasks
+      labbuildr-scripts: labbuildr-scripts
+    params:
+      <<: *vsphere_env
+      LABBUILDR_VM_NAME: dcnode
+      LABBUILDR_SCRIPTS:
+        - node
+        - dcnode
+
