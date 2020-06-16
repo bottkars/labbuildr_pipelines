@@ -11,7 +11,7 @@ vsphere_env: &vsphere_env
   LABBUILDR_DATASTORE: ((LABBUILDR.LAB1.DATASTORE)) 
   LABBUILDR_DATACENTER: ((LABBUILDR.LAB1.DATACENTER))
   LABBUILDR_NETWORK: ((LABBUILDR.LAB1.NETWORK))
-  LABBUILDR_ADDRESS: ((LABBUILDR.LAB1.ADDRESS))
+  LABBUILDR_SUBNET: ((LABBUILDR.LAB1.SUBNET))
   LABBUILDR_GATEWAY: ((LABBUILDR.LAB1.GATEWAY))
   LABBUILDR_NETMASK: ((LABBUILDR.LAB1.NETMASK))
   LABBUILDR_FQDN: ((LABBUILDR.LAB1.FQDN))
@@ -33,7 +33,11 @@ resource_types:
     tag: latest-final
    
 resources:
-
+- name: one-time-trigger
+  icon: calendar-clock
+  type: time
+  source:
+    interval: 999999h
 - name: dps-automation-image
   icon: cloud-download
   tags: ((tags))      
@@ -66,14 +70,15 @@ jobs:
 - name: deploy-dc
   plan:
   - in_parallel:
+    - get: one-time-trigger
+      trigger: true
+      tags: ((tags))
     - get: dps-automation-image
       params:
         unpack: true
       tags: ((tags))        
     - get: labbuildr-concourse-tasks
-      tags: ((tags))
-    - get: labbuildr-scripts
-      tags: ((tags))      
+      tags: ((tags))    
   - task: clone-node
     tags: ((tags))
     image: dps-automation-image
@@ -85,12 +90,6 @@ jobs:
       LABBUILDR_VM_NAME: dcnode
       LABBUILDR_VM_MEMORY: 4096
       LABBUILDR_VM_CPU: 2
-  - task: configure-node
-    tags: ((tags))
-    image: dps-automation-image
-    file: labbuildr-concourse-tasks/vsphere/tasks/clone-node.yml
-    input_mapping:
-      labbuildr-concourse-tasks: labbuildr-concourse-tasks      
 
 - name: configure-dc
   plan:
@@ -98,11 +97,14 @@ jobs:
     - get: dps-automation-image
       params:
         unpack: true
+      passed:
+      - deploy-dc 
+      trigger: true       
       tags: ((tags))        
     - get: labbuildr-concourse-tasks
       tags: ((tags))
     - get: labbuildr-scripts
-      tags: ((tags))      
+      tags: ((tags))   
   - task: configure-node
     tags: ((tags))
     image: dps-automation-image
@@ -117,3 +119,24 @@ jobs:
         - node
         - dcnode
 
+- name: delete-dc
+  plan:
+  - in_parallel:
+    - get: dps-automation-image
+      params:
+        unpack: true
+      tags: ((tags))
+      passed:
+      - deploy-dc
+      trigger: false       
+    - get: labbuildr-concourse-tasks
+      tags: ((tags))    
+  - task: delete-node
+    tags: ((tags))
+    image: dps-automation-image
+    file: labbuildr-concourse-tasks/vsphere/tasks/delete-node.yml
+    input_mapping:
+      labbuildr-concourse-tasks: labbuildr-concourse-tasks
+    params:
+      <<: *vsphere_env
+      LABBUILDR_VM_NAME: dcnode
