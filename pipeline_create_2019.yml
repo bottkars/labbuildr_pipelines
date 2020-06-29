@@ -12,7 +12,7 @@ resource_types:
     tag: 1.5.4
 
 resources:
-- name: build-vsphere-2019
+- name: build-vsphere-((edition))
   icon: server-plus
   tags: ((tags))
   type: packer
@@ -29,7 +29,7 @@ jobs:
 - name: build-vsphere
   plan:
   - get: labbuildr-pipelines
-  - put: build-vsphere-2019
+  - put: build-vsphere-((edition))
     params:
       debug: true
       template: labbuildr-pipelines/packer/windows_2019.json
@@ -38,7 +38,8 @@ jobs:
         vcenter_server: ((GOVC.URL))
         username: ((GOVC.USERNAME))
         password: ((GOVC.PASSWORD))
-        vm_name: 2019_template
+        vm_name: ((edition))_template
+        edition: ((edition))
         host: esxi-mgmt.home.labbuildr.com
         resource_pool: mgmt_pool
         datastore: QNAP_DS1
