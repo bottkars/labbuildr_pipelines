@@ -21,6 +21,7 @@ vsphere_env: &vsphere_env
   LABBUILDR_LANGUAGE_TAG: ((LABBUILDR.LAB1.LANGUAGE_TAG))
   LABBUILDR_LOGINUSER: ((LABBUILDR.LAB1.WINDOWS_LOGINUSER))
 
+
   
 s3_env: &s3_env
   access_key_id: ((((foundation))/s3_access_key_id))
@@ -71,7 +72,7 @@ resources:
 
 jobs:
 
-- name: deploy-dc
+- name: clone-node
   plan:
   - in_parallel:
     - get: one-time-trigger
@@ -91,40 +92,42 @@ jobs:
       labbuildr-concourse-tasks: labbuildr-concourse-tasks
     params:
       <<: *vsphere_env
-      LABBUILDR_VM_NAME: dcnode
-      LABBUILDR_VM_MEMORY: 4096
+      LABBUILDR_VM_NAME: ((LABBUILDR.LAB1.SQL_SINGLE_NODE.VMNAME))
+      LABBUILDR_VM_MEMORY: 8192
       LABBUILDR_VM_CPU: 2
-      LABBUILDR_VM_TEMPLATE: ((LABBUILDR.LAB1.DCNODE.TEMPLATE))
+      LABBUILDR_VM_TEMPLATE: ((LABBUILDR.LAB1.SQL_SINGLE_NODE.TEMPLATE))
 
-- name: configure-dc
+- name: join-domain
   plan:
   - in_parallel:
     - get: dps-automation-image
       params:
         unpack: true
       passed:
-      - deploy-dc 
+      - clone-node 
       trigger: true       
       tags: ((tags))        
     - get: labbuildr-concourse-tasks
       tags: ((tags))
     - get: labbuildr-scripts
       tags: ((tags))   
-  - task: configure-node
+  - task: join-domain
     tags: ((tags))
     image: dps-automation-image
-    file: labbuildr-concourse-tasks/vsphere/tasks/configure-dcnode.yml
+    file: labbuildr-concourse-tasks/vsphere/tasks/domainjoin.yml
     input_mapping:
       labbuildr-concourse-tasks: labbuildr-concourse-tasks
       labbuildr-scripts: labbuildr-scripts
     params:
       <<: *vsphere_env
-      LABBUILDR_VM_NAME: dcnode
+      LABBUILDR_VM_NAME: ((LABBUILDR.LAB1.SQL_SINGLE_NODE.VMNAME))
+      LABBUILDR_VM_IP: ((LABBUILDR.LAB1.SUBNET)).((LABBUILDR.LAB1.SQL_SINGLE_NODE.IP))
       LABBUILDR_SCRIPTS:
         - node
-        - dcnode
+        - SQL
+      ADDON_FEATURES: "RSAT-ADDS, RSAT-ADDS-TOOLS, AS-HTTP-Activation, NET-Framework-45-Features"  
 
-- name: delete-dc
+- name: delete-sqlnode
   plan:
   - in_parallel:
     - get: dps-automation-image
@@ -132,7 +135,7 @@ jobs:
         unpack: true
       tags: ((tags))
       passed:
-      - deploy-dc
+      - clone-node
       trigger: false       
     - get: labbuildr-concourse-tasks
       tags: ((tags))    
@@ -144,4 +147,4 @@ jobs:
       labbuildr-concourse-tasks: labbuildr-concourse-tasks
     params:
       <<: *vsphere_env
-      LABBUILDR_VM_NAME: dcnode
+      LABBUILDR_VM_NAME: ((LABBUILDR.LAB1.SQL_SINGLE_NODE.VMNAME))
