@@ -157,7 +157,7 @@ jobs:
         unpack: true
       passed:
       - clone-node
-        trigger: true
+      trigger: true
       - generate-scripts-iso
       tags: ((tags))        
     - get: labbuildr-concourse-tasks
