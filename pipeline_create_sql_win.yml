@@ -19,7 +19,7 @@ vsphere_env: &vsphere_env
   LABBUILDR_VM_FOLDER: ((LABBUILDR.LAB1.VM_FOLDER))
   LABBUILDR_TIMEZONE: ((LABBUILDR.LAB1.TIMEZONE))
   LABBUILDR_LANGUAGE_TAG: ((LABBUILDR.LAB1.LANGUAGE_TAG))
-  LABBUILDR_LOGINUSER: "((LABBUILDR.LAB1.WINDOWS_LOGINUSER))"
+  LABBUILDR_LOGINUSER: ((LABBUILDR.LAB1.WINDOWS_LOGINUSER))
 
 
   
@@ -96,8 +96,7 @@ jobs:
       LABBUILDR_VM_MEMORY: 8192
       LABBUILDR_VM_CPU: 2
       LABBUILDR_VM_TEMPLATE: ((LABBUILDR.LAB1.SQL_SINGLE_NODE.TEMPLATE))
-
-- name: join-domain
+- name: generate-scripts-iso
   plan:
   - in_parallel:
     - get: dps-automation-image
@@ -106,6 +105,60 @@ jobs:
       passed:
       - clone-node 
       trigger: true       
+      tags: ((tags))        
+    - get: labbuildr-concourse-tasks
+      tags: ((tags))
+    - get: labbuildr-scripts
+      tags: ((tags))   
+  - task: generate-and-connect-cdrom
+    tags: ((tags))
+    image: dps-automation-image
+    file: labbuildr-concourse-tasks/vsphere/tasks/generate-scripts-iso.yml
+    input_mapping:
+      labbuildr-concourse-tasks: labbuildr-concourse-tasks
+      labbuildr-scripts: labbuildr-scripts
+    params:
+      <<: *vsphere_env
+      LABBUILDR_VM_NAME: ((LABBUILDR.LAB1.SQL_SINGLE_NODE.VMNAME))
+      LABBUILDR_DEVICE: cdrom-3000
+      LABBUILDR_SCRIPTS:
+        - node
+        - SQL
+- name: diconnect-scripts-iso
+  plan:
+  - in_parallel:
+    - get: dps-automation-image
+      params:
+        unpack: true
+      passed:
+      - generate-scripts-iso       
+      tags: ((tags))        
+    - get: labbuildr-concourse-tasks
+      tags: ((tags))
+    - get: labbuildr-scripts
+      tags: ((tags))   
+  - task: disconnect-cdrom
+    tags: ((tags))
+    image: dps-automation-image
+    file: labbuildr-concourse-tasks/vsphere/tasks/disconnect-scripts-iso.yml
+    input_mapping:
+      labbuildr-concourse-tasks: labbuildr-concourse-tasks
+      labbuildr-scripts: labbuildr-scripts
+    params:
+      <<: *vsphere_env
+      LABBUILDR_VM_NAME: ((LABBUILDR.LAB1.SQL_SINGLE_NODE.VMNAME))
+      LABBUILDR_DEVICE: cdrom-3000
+
+- name: join-domain
+  plan:
+  - in_parallel:
+    - get: dps-automation-image
+      params:
+        unpack: true
+      passed:
+      - clone-node
+        trigger: true
+      - generate-scripts-iso
       tags: ((tags))        
     - get: labbuildr-concourse-tasks
       tags: ((tags))
@@ -155,6 +208,7 @@ jobs:
         - node
         - SQL
       LABBUILDR_SQL_ISO: ((LABBUILDR.LAB1.SQLSERVER2019_ISO))
+
 
 
 
