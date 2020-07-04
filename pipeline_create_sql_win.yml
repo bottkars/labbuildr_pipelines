@@ -20,6 +20,7 @@ vsphere_env: &vsphere_env
   LABBUILDR_TIMEZONE: ((LABBUILDR.LAB1.TIMEZONE))
   LABBUILDR_LANGUAGE_TAG: ((LABBUILDR.LAB1.LANGUAGE_TAG))
   LABBUILDR_LOGINUSER: ((LABBUILDR.LAB1.WINDOWS_LOGINUSER))
+  LABBUILDR_DEBUG: ((LABBUILDR.LAB1.DEBUG))
 
 
   
@@ -103,8 +104,8 @@ jobs:
       params:
         unpack: true
       passed:
-      - clone-node 
-      trigger: true       
+      - clone-node
+      trigger: true      
       tags: ((tags))        
     - get: labbuildr-concourse-tasks
       tags: ((tags))
@@ -134,16 +135,13 @@ jobs:
       - generate-scripts-iso       
       tags: ((tags))        
     - get: labbuildr-concourse-tasks
-      tags: ((tags))
-    - get: labbuildr-scripts
-      tags: ((tags))   
+      tags: ((tags)) 
   - task: disconnect-cdrom
     tags: ((tags))
     image: dps-automation-image
     file: labbuildr-concourse-tasks/vsphere/tasks/disconnect-scripts-iso.yml
     input_mapping:
       labbuildr-concourse-tasks: labbuildr-concourse-tasks
-      labbuildr-scripts: labbuildr-scripts
     params:
       <<: *vsphere_env
       LABBUILDR_VM_NAME: ((LABBUILDR.LAB1.SQL_SINGLE_NODE.VMNAME))
@@ -157,13 +155,11 @@ jobs:
         unpack: true
       passed:
       - clone-node
-      trigger: true
       - generate-scripts-iso
+      trigger: true
       tags: ((tags))        
     - get: labbuildr-concourse-tasks
       tags: ((tags))
-    - get: labbuildr-scripts
-      tags: ((tags))   
   - task: join-domain
     tags: ((tags))
     image: dps-automation-image
@@ -180,6 +176,29 @@ jobs:
         - SQL
       ADDON_FEATURES: "RSAT-ADDS, RSAT-ADDS-TOOLS, AS-HTTP-Activation, NET-Framework-45-Features"  
 
+- name: unjoin-domain
+  plan:
+  - in_parallel:
+    - get: dps-automation-image
+      params:
+        unpack: true
+      passed:
+      - join-domain
+      tags: ((tags))        
+    - get: labbuildr-concourse-tasks
+      tags: ((tags))
+  - task: unjoin-domain
+    tags: ((tags))
+    image: dps-automation-image
+    file: labbuildr-concourse-tasks/vsphere/tasks/unjoin.yml
+    input_mapping:
+      labbuildr-concourse-tasks: labbuildr-concourse-tasks
+      labbuildr-scripts: labbuildr-scripts
+    params:
+      <<: *vsphere_env
+      LABBUILDR_VM_NAME: ((LABBUILDR.LAB1.SQL_SINGLE_NODE.VMNAME))
+      LABBUILDR_DCNODE: ((LABBUILDR.LAB1.DCNODE.NAME))
+ 
 - name: setup-sql
   plan:
   - in_parallel:
@@ -191,9 +210,7 @@ jobs:
       trigger: true       
       tags: ((tags))        
     - get: labbuildr-concourse-tasks
-      tags: ((tags))
-    - get: labbuildr-scripts
-      tags: ((tags))   
+      tags: ((tags)) 
   - task: install-sql
     tags: ((tags))
     image: dps-automation-image
