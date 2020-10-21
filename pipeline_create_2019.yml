@@ -9,7 +9,7 @@ resource_types:
   type: docker-image
   source:
     repository: snapkitchen/concourse-packer-resource
-    tag: 1.5.4
+    tag: 1.6.2
 
 resources:
 - name: build-vsphere-((edition))
@@ -31,6 +31,7 @@ jobs:
   - get: labbuildr-pipelines
   - put: build-vsphere-((edition))
     params:
+      force: true
       debug: false
       template: labbuildr-pipelines/packer/windows_2019.json
       vars:

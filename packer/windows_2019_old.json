@@ -1,0 +1,78 @@
+{
+    "builders": [
+        {
+            "winrm_timeout": "1h",
+            "shutdown_timeout": "1h",
+            "name": "{{user `builder_name`}}",    
+            "type": "vsphere-iso",
+            "vcenter_server": "{{user `vcenter_server`}}",
+            "username": "{{user `username`}}",
+            "password": "{{user `password`}}",
+            "insecure_connection": "true",
+            "vm_name": "{{user `vm_name`}}",
+            "host": "{{user `host`}}",
+            "resource_pool": "{{user `resource_pool`}}",
+            "datastore": "{{user `datastore`}}",
+            "guest_os_type": "windows9Server64Guest",
+            "communicator": "winrm",
+            "winrm_username": "administrator",
+            "winrm_password": "packer",
+            "shutdown_command": "a:/sysprep.bat",
+            "CPUs": 2,
+            "RAM": 8192,
+            "RAM_reserve_all": true,
+            "disk_controller_type": "pvscsi",
+            "disk_size": 32768,
+            "disk_thin_provisioned": true,
+            "network_adapters": [
+                {
+                    "network_card": "vmxnet3",
+                    "network": "{{user `network`}}"
+                }
+            ],
+            "iso_paths": [
+                "{{user `win_iso`}}",
+                "{{user `tools_iso`}}"
+            ],
+            "floppy_files": [
+                "{{template_dir}}/scripts/2019",
+                "{{template_dir}}/answerfiles/{{user `edition`}}"
+            ],
+            "floppy_img_path": "{{user `floppy_img`}}",
+            "convert_to_template": true
+        }
+    ],
+    "provisioners": [
+        {
+            "type": "powershell",
+            "inline":[
+                "Write-Host '==> Latest Update is' $(Get-WUAVersion)",
+                "Write-Host '==> Latest Update Date is' $(Get-WULastInstallationDate)",
+                "Write-Host '==> Scanning for Updates'",
+                "$Updates=Start-WUScan",
+                "if ($Updates) {",
+                    "Write-Host '==> Installing Updates'",
+                    "Install-WUUpdates -updates $Updates -verbose }",
+                    "else",
+                    "{Write-Host '==> no pending updates'}",
+                "if (Get-WUIsPendingReboot) {write-host 'pending reboot<==';Restart-computer -Force} else {Write-Host '==>No Reboot Required<=='}"
+
+            ]
+        },
+        {
+            "type": "powershell",
+            "inline": [
+                "Write-Host '==> Latest Update is' $(Get-WUAVersion)",
+                "Write-Host '==> Latest Update Date is' $(Get-WULastInstallationDate)",
+                "if (Get-WUIsPendingReboot) {write-host 'pending reboot<==';Restart-Computer -Force} else {Write-Host '==>No Reboot Required<=='}"
+            ]
+        },
+        {
+            "type": "powershell",
+            "inline": [
+                "if (Get-WUIsPendingReboot) {write-host 'pending reboot<==';Restart-Computer -Force} else {Write-Host '==>No Reboot Required<=='}"
+            ]
+
+        }
+    ]
+}
