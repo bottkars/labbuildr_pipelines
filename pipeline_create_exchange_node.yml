@@ -44,6 +44,7 @@ resources:
   type: time
   source:
     interval: 999999h
+
 - name: dps-automation-image
   icon: docker
   type: docker-image
@@ -67,7 +68,13 @@ resources:
   source:  
     uri: https://github.com/bottkars/labbuildr-concourse-tasks.git
     branch: master
-
+- name: netframework
+  type: s3
+  icon: folder-move
+  source:
+    <<: *s3_env
+    bucket: swdist
+    regexp: netframework/ndp(.*)-x86-x64-allos-enu.exe
 jobs:
 
 - name: clone-node
@@ -163,8 +170,8 @@ jobs:
       LABBUILDR_SCRIPTS:
         - node
         - E2019
-      ADDON_FEATURES: "RSAT-ADDS, RSAT-ADDS-TOOLS, AS-HTTP-Activation, NET-Framework-45-Features"  
-
+      #ADDON_FEATURES: "RSAT-ADDS, RSAT-ADDS-TOOLS, AS-HTTP-Activation, NET-Framework-45-Features"  
+      ADDON_FEATURES: "Server-Media-Foundation, NET-Framework-45-Features, RPC-over-HTTP-proxy, RSAT-Clustering, RSAT-Clustering-CmdInterface, RSAT-Clustering-Mgmt, RSAT-Clustering-PowerShell, WAS-Process-Model, Web-Asp-Net45, Web-Basic-Auth, Web-Client-Auth, Web-Digest-Auth, Web-Dir-Browsing, Web-Dyn-Compression, Web-Http-Errors, Web-Http-Logging, Web-Http-Redirect, Web-Http-Tracing, Web-ISAPI-Ext, Web-ISAPI-Filter, Web-Lgcy-Mgmt-Console, Web-Metabase, Web-Mgmt-Console, Web-Mgmt-Service, Web-Net-Ext45, Web-Request-Monitor, Web-Server, Web-Stat-Compression, Web-Static-Content, Web-Windows-Auth, Web-WMI, Windows-Identity-Foundation, RSAT-ADDS"
 - name: unjoin-domain
   plan:
   - in_parallel:
@@ -195,7 +202,9 @@ jobs:
       trigger: true       
       tags: ((tags))        
     - get: labbuildr-concourse-tasks
-      tags: ((tags)) 
+      tags: ((tags))
+    - get: netframework
+      tags: ((tags))
   - task: install-exchange
     tags: ((tags))
     image: dps-automation-image
