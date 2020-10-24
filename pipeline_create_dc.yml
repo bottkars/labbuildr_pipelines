@@ -43,14 +43,11 @@ resources:
   source:
     interval: 999999h
 - name: dps-automation-image
-  icon: cloud-download
-  tags: ((tags))      
-  type: s3
+  icon: docker
+  type: docker-image
   source:
-    <<: *s3_env
-    bucket: ((buckets.pivnet_image))
-    regexp: platform-automation-image-(.*).tgz
-
+    repository: bottkars/dps-automation-image
+    tag: 0.3.12
 
 - name: labbuildr-scripts
   tags: ((tags))
@@ -70,7 +67,6 @@ resources:
     branch: master
 
 jobs:
-
 - name: deploy-dc
   plan:
   - in_parallel:
@@ -78,8 +74,6 @@ jobs:
       trigger: true
       tags: ((tags))
     - get: dps-automation-image
-      params:
-        unpack: true
       tags: ((tags))        
     - get: labbuildr-concourse-tasks
       tags: ((tags))    
@@ -100,8 +94,6 @@ jobs:
   plan:
   - in_parallel:
     - get: dps-automation-image
-      params:
-        unpack: true
       passed:
       - deploy-dc 
       trigger: true       
@@ -128,8 +120,6 @@ jobs:
   plan:
   - in_parallel:
     - get: dps-automation-image
-      params:
-        unpack: true
       tags: ((tags))
       passed:
       - deploy-dc

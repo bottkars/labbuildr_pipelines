@@ -51,7 +51,6 @@ resources:
     repository: bottkars/dps-automation-image
     tag: 0.3.12
 
-
 - name: labbuildr-scripts
   tags: ((tags))
   icon: git
@@ -89,10 +88,10 @@ jobs:
       labbuildr-concourse-tasks: labbuildr-concourse-tasks
     params:
       <<: *vsphere_env
-      LABBUILDR_VM_NAME: ((LABBUILDR.LAB1.SQL_SINGLE_NODE.VMNAME))
+      LABBUILDR_VM_NAME: ((LABBUILDR.LAB1.EXCHANGE_FIRST_NODE.VMNAME))
       LABBUILDR_VM_MEMORY: 8192
       LABBUILDR_VM_CPU: 2
-      LABBUILDR_VM_TEMPLATE: ((LABBUILDR.LAB1.SQL_SINGLE_NODE.TEMPLATE))
+      LABBUILDR_VM_TEMPLATE: ((LABBUILDR.LAB1.EXCHANGE_FIRST_NODE.TEMPLATE))
 - name: generate-scripts-iso
   plan:
   - in_parallel:
@@ -114,11 +113,11 @@ jobs:
       labbuildr-scripts: labbuildr-scripts
     params:
       <<: *vsphere_env
-      LABBUILDR_VM_NAME: ((LABBUILDR.LAB1.SQL_SINGLE_NODE.VMNAME))
+      LABBUILDR_VM_NAME: ((LABBUILDR.LAB1.EXCHANGE_FIRST_NODE.VMNAME))
       LABBUILDR_DEVICE: cdrom-3000
       LABBUILDR_SCRIPTS:
         - node
-        - SQL
+        - EXCHANGE
 - name: diconnect-scripts-iso
   plan:
   - in_parallel:
@@ -136,7 +135,7 @@ jobs:
       labbuildr-concourse-tasks: labbuildr-concourse-tasks
     params:
       <<: *vsphere_env
-      LABBUILDR_VM_NAME: ((LABBUILDR.LAB1.SQL_SINGLE_NODE.VMNAME))
+      LABBUILDR_VM_NAME: ((LABBUILDR.LAB1.EXCHANGE_FIRST_NODE.VMNAME))
       LABBUILDR_DEVICE: cdrom-3000
 
 - name: join-domain
@@ -159,11 +158,11 @@ jobs:
       labbuildr-scripts: labbuildr-scripts
     params:
       <<: *vsphere_env
-      LABBUILDR_VM_NAME: ((LABBUILDR.LAB1.SQL_SINGLE_NODE.VMNAME))
-      LABBUILDR_VM_IP: ((LABBUILDR.LAB1.SUBNET)).((LABBUILDR.LAB1.SQL_SINGLE_NODE.IP))
+      LABBUILDR_VM_NAME: ((LABBUILDR.LAB1.EXCHANGE_FIRST_NODE.VMNAME))
+      LABBUILDR_VM_IP: ((LABBUILDR.LAB1.SUBNET)).((LABBUILDR.LAB1.EXCHANGE_FIRST_NODE.IP))
       LABBUILDR_SCRIPTS:
         - node
-        - SQL
+        - E2019
       ADDON_FEATURES: "RSAT-ADDS, RSAT-ADDS-TOOLS, AS-HTTP-Activation, NET-Framework-45-Features"  
 
 - name: unjoin-domain
@@ -184,10 +183,10 @@ jobs:
       labbuildr-scripts: labbuildr-scripts
     params:
       <<: *vsphere_env
-      LABBUILDR_VM_NAME: ((LABBUILDR.LAB1.SQL_SINGLE_NODE.VMNAME))
+      LABBUILDR_VM_NAME: ((LABBUILDR.LAB1.EXCHANGE_FIRST_NODE.VMNAME))
       LABBUILDR_DCNODE: ((LABBUILDR.LAB1.DCNODE.NAME))
  
-- name: setup-sql
+- name: setup-exchange
   plan:
   - in_parallel:
     - get: dps-automation-image
@@ -197,22 +196,26 @@ jobs:
       tags: ((tags))        
     - get: labbuildr-concourse-tasks
       tags: ((tags)) 
-  - task: install-sql
+  - task: install-exchange
     tags: ((tags))
     image: dps-automation-image
-    file: labbuildr-concourse-tasks/vsphere/tasks/configure-sqlnode.yml
+    file: labbuildr-concourse-tasks/vsphere/tasks/configure-exchangenode.yml
     input_mapping:
       labbuildr-concourse-tasks: labbuildr-concourse-tasks
       labbuildr-scripts: labbuildr-scripts
     params:
       <<: *vsphere_env
-      LABBUILDR_VM_NAME: ((LABBUILDR.LAB1.SQL_SINGLE_NODE.VMNAME))
+      LABBUILDR_VM_NAME: ((LABBUILDR.LAB1.EXCHANGE_FIRST_NODE.VMNAME))
       LABBUILDR_SCRIPTS:
         - node
-        - SQL
-      LABBUILDR_SQL_ISO: ((LABBUILDR.LAB1.SQLSERVER2019_ISO))
+        - EXCHANGE
+      LABBUILDR_EXCHANGE_ISO: ((LABBUILDR.LAB1.EXCHANGESERVER2019_ISO))
+      LABBUILDR_EXCHANGE_CU: ((LABBUILDR.LAB1.EXCHANGESERVER2019_CU))
 
-- name: delete-sqlnode
+
+
+
+- name: delete-exchangenode
   plan:
   - in_parallel:
     - get: dps-automation-image
@@ -230,4 +233,4 @@ jobs:
       labbuildr-concourse-tasks: labbuildr-concourse-tasks
     params:
       <<: *vsphere_env
-      LABBUILDR_VM_NAME: ((LABBUILDR.LAB1.SQL_SINGLE_NODE.VMNAME))
+      LABBUILDR_VM_NAME: ((LABBUILDR.LAB1.EXCHANGE_FIRST_NODE.VMNAME))
