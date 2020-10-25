@@ -21,8 +21,8 @@ vsphere_env: &vsphere_env
   LABBUILDR_LANGUAGE_TAG: ((LABBUILDR.LAB1.LANGUAGE_TAG))
   LABBUILDR_LOGINUSER: ((LABBUILDR.LAB1.WINDOWS_LOGINUSER))
   LABBUILDR_DEBUG: ((LABBUILDR.LAB1.DEBUG))
-  LABBUILDR_VM_IPATH: ((LABBUILDR.LAB1.VM_FOLDER))/((LABBUILDR.LAB1.EXCHANGE_FIRST_NODE.VMNAME))
-  LABBUILDR_VM_NAME: ((LABBUILDR.LAB1.EXCHANGE_FIRST_NODE.VMNAME))
+  LABBUILDR_VM_IPATH: ((LABBUILDR.LAB1.VM_FOLDER))/((LABBUILDR.LAB1.EXCHANGE_NODE.VMNAME))
+  LABBUILDR_VM_NAME: ((LABBUILDR.LAB1.EXCHANGE_NODE.VMNAME))
   GUEST_SCRIPT_DIR: ((LABBUILDR.GUEST_SCRIPT_DIR))
   NODE_SCRIPT_DIR: ((LABBUILDR.GUEST_SCRIPT_DIR))/((LABBUILDR.NODE_SCRIPT_DIR))
   SCENARIO_SCRIPT_DIR: ((LABBUILDR.GUEST_SCRIPT_DIR))/((LABBUILDR.SCENARIO_SCRIPT_DIR))
@@ -123,7 +123,7 @@ jobs:
       <<: *vsphere_env
       LABBUILDR_VM_MEMORY: 8192
       LABBUILDR_VM_CPU: 2
-      LABBUILDR_VM_TEMPLATE: ((LABBUILDR.LAB1.EXCHANGE_FIRST_NODE.TEMPLATE))
+      LABBUILDR_VM_TEMPLATE: ((LABBUILDR.LAB1.EXCHANGE_NODE.TEMPLATE))
 - name: generate-scripts-iso
   plan:
   - in_parallel:
@@ -190,7 +190,7 @@ jobs:
       labbuildr-scripts: labbuildr-scripts
     params:
       <<: *vsphere_env
-      LABBUILDR_VM_IP: ((LABBUILDR.LAB1.SUBNET)).((LABBUILDR.LAB1.EXCHANGE_FIRST_NODE.IP))
+      LABBUILDR_VM_IP: ((LABBUILDR.LAB1.SUBNET)).((LABBUILDR.LAB1.EXCHANGE_NODE.IP))
       LABBUILDR_SCRIPTS:
         - node
         - E2019
@@ -275,6 +275,58 @@ jobs:
         - EXCHANGE
       LABBUILDR_EXCHANGE_ISO: ((LABBUILDR.LAB1.EXCHANGESERVER2019_ISO))
       LABBUILDR_EXCHANGE_CU: ((LABBUILDR.LAB1.EXCHANGESERVER2019_CU))
+
+
+- name: deploy-exchange
+  plan:
+  - in_parallel:
+    - get: dps-automation-image
+    - get: one-time-trigger
+      passed:
+      - deploy-exchange-prereqs
+      trigger: true       
+      tags: ((tags))        
+    - get: labbuildr-concourse-tasks
+      tags: ((tags))
+  - task: install-exchange
+    tags: ((tags))
+    image: dps-automation-image
+    file: labbuildr-concourse-tasks/vsphere/tasks/deploy-exchange.yml
+    input_mapping:
+      labbuildr-concourse-tasks: labbuildr-concourse-tasks
+      labbuildr-scripts: labbuildr-scripts
+    params:
+      <<: *vsphere_env
+      LABBUILDR_SCRIPTS:
+        - node
+        - EXCHANGE
+      LABBUILDR_EXCHANGE_ISO: ((LABBUILDR.LAB1.EXCHANGESERVER2019_ISO))
+      LABBUILDR_EXCHANGE_CU: ((LABBUILDR.LAB1.EXCHANGESERVER2019_CU))
+
+- name: create-dag-exchange
+  plan:
+  - in_parallel:
+    - get: dps-automation-image
+    - get: one-time-trigger
+      passed:
+      - deploy-exchange
+      trigger: false      
+      tags: ((tags))        
+    - get: labbuildr-concourse-tasks
+      tags: ((tags))
+  - task: create-dag
+    tags: ((tags))
+    image: dps-automation-image
+    file: labbuildr-concourse-tasks/vsphere/tasks/create-dag.yml
+    input_mapping:
+      labbuildr-concourse-tasks: labbuildr-concourse-tasks
+      labbuildr-scripts: labbuildr-scripts
+    params:
+      <<: *vsphere_env
+      LABBUILDR_SCRIPTS:
+        - node
+        - EXCHANGE
+      LABBUILDR_EXCHANGE_ISO: ((LABBUILDR.LAB1.EXCHANGESERVER2019_ISO))
       LABBUILDR_EXCHANGE_CU: ((LABBUILDR.LAB1.EXCHANGESERVER2019_CU))
 
 - name: delete-exchangenode
