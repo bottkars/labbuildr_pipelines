@@ -21,9 +21,12 @@ vsphere_env: &vsphere_env
   LABBUILDR_LANGUAGE_TAG: ((LABBUILDR.LAB1.LANGUAGE_TAG))
   LABBUILDR_LOGINUSER: ((LABBUILDR.LAB1.WINDOWS_LOGINUSER))
   LABBUILDR_DEBUG: ((LABBUILDR.LAB1.DEBUG))
+  LABBUILDR_VM_IPATH: ((LABBUILDR.LAB1.VM_FOLDER))/((LABBUILDR.LAB1.EXCHANGE_FIRST_NODE.VMNAME))
+  LABBUILDR_VM_NAME: ((LABBUILDR.LAB1.EXCHANGE_FIRST_NODE.VMNAME))
+  GUEST_SCRIPT_DIR: ((LABBUILDR.GUEST_SCRIPT_DIR))
+  NODE_SCRIPT_DIR: ((LABBUILDR.GUEST_SCRIPT_DIR))/((LABBUILDR.NODE_SCRIPT_DIR))
+  SCENARIO_SCRIPT_DIR: ((LABBUILDR.GUEST_SCRIPT_DIR))/((LABBUILDR.SCENARIO_SCRIPT_DIR))
 
-
-  
 s3_env: &s3_env
   access_key_id: ((((foundation))/s3_access_key_id))
   endpoint:  ((((foundation))/s3_endpoint))
@@ -75,8 +78,31 @@ resources:
     <<: *s3_env
     bucket: swdist
     regexp: netframework/ndp(.*)-x86-x64-allos-enu.exe
-jobs:
 
+- name: ucmaruntime
+  type: s3
+  icon: folder-move
+  source:
+    <<: *s3_env
+    bucket: swdist
+    regexp: ucmaruntime/UcmaRuntimeSetup-(.*).exe
+- name: vcredist11
+  type: s3
+  icon: folder-move
+  source:
+    <<: *s3_env
+    bucket: swdist
+    regexp: vcredist/vcredist_x64-(11\..*).exe
+- name: vcredist12
+  type: s3
+  icon: folder-move
+  source:
+    <<: *s3_env
+    bucket: swdist
+    regexp: vcredist/vcredist_x64-(12\..*).exe  
+
+
+jobs:
 - name: clone-node
   plan:
   - in_parallel:
@@ -95,7 +121,6 @@ jobs:
       labbuildr-concourse-tasks: labbuildr-concourse-tasks
     params:
       <<: *vsphere_env
-      LABBUILDR_VM_NAME: ((LABBUILDR.LAB1.EXCHANGE_FIRST_NODE.VMNAME))
       LABBUILDR_VM_MEMORY: 8192
       LABBUILDR_VM_CPU: 2
       LABBUILDR_VM_TEMPLATE: ((LABBUILDR.LAB1.EXCHANGE_FIRST_NODE.TEMPLATE))
@@ -103,6 +128,7 @@ jobs:
   plan:
   - in_parallel:
     - get: dps-automation-image
+    - get: one-time-trigger
       passed:
       - clone-node
       trigger: true      
@@ -120,7 +146,6 @@ jobs:
       labbuildr-scripts: labbuildr-scripts
     params:
       <<: *vsphere_env
-      LABBUILDR_VM_NAME: ((LABBUILDR.LAB1.EXCHANGE_FIRST_NODE.VMNAME))
       LABBUILDR_DEVICE: cdrom-3000
       LABBUILDR_SCRIPTS:
         - node
@@ -142,15 +167,15 @@ jobs:
       labbuildr-concourse-tasks: labbuildr-concourse-tasks
     params:
       <<: *vsphere_env
-      LABBUILDR_VM_NAME: ((LABBUILDR.LAB1.EXCHANGE_FIRST_NODE.VMNAME))
       LABBUILDR_DEVICE: cdrom-3000
 
 - name: join-domain
   plan:
   - in_parallel:
     - get: dps-automation-image
+    - get: one-time-trigger
       passed:
-      - clone-node
+#      - clone-node
       - generate-scripts-iso
       trigger: true
       tags: ((tags))        
@@ -165,7 +190,6 @@ jobs:
       labbuildr-scripts: labbuildr-scripts
     params:
       <<: *vsphere_env
-      LABBUILDR_VM_NAME: ((LABBUILDR.LAB1.EXCHANGE_FIRST_NODE.VMNAME))
       LABBUILDR_VM_IP: ((LABBUILDR.LAB1.SUBNET)).((LABBUILDR.LAB1.EXCHANGE_FIRST_NODE.IP))
       LABBUILDR_SCRIPTS:
         - node
@@ -190,22 +214,20 @@ jobs:
       labbuildr-scripts: labbuildr-scripts
     params:
       <<: *vsphere_env
-      LABBUILDR_VM_NAME: ((LABBUILDR.LAB1.EXCHANGE_FIRST_NODE.VMNAME))
       LABBUILDR_DCNODE: ((LABBUILDR.LAB1.DCNODE.NAME))
  
-- name: setup-exchange
+- name: setup-exchange-node
   plan:
   - in_parallel:
     - get: dps-automation-image
+    - get: one-time-trigger
       passed:
       - join-domain 
       trigger: true       
       tags: ((tags))        
     - get: labbuildr-concourse-tasks
       tags: ((tags))
-    - get: netframework
-      tags: ((tags))
-  - task: install-exchange
+  - task: setup-exchange-node
     tags: ((tags))
     image: dps-automation-image
     file: labbuildr-concourse-tasks/vsphere/tasks/configure-exchangenode.yml
@@ -214,15 +236,46 @@ jobs:
       labbuildr-scripts: labbuildr-scripts
     params:
       <<: *vsphere_env
-      LABBUILDR_VM_NAME: ((LABBUILDR.LAB1.EXCHANGE_FIRST_NODE.VMNAME))
       LABBUILDR_SCRIPTS:
         - node
         - EXCHANGE
       LABBUILDR_EXCHANGE_ISO: ((LABBUILDR.LAB1.EXCHANGESERVER2019_ISO))
       LABBUILDR_EXCHANGE_CU: ((LABBUILDR.LAB1.EXCHANGESERVER2019_CU))
 
-
-
+- name: deploy-exchange-prereqs
+  plan:
+  - in_parallel:
+    - get: dps-automation-image
+    - get: one-time-trigger
+      passed:
+      - setup-exchange-node
+      trigger: true       
+      tags: ((tags))        
+    - get: labbuildr-concourse-tasks
+      tags: ((tags))
+    - get: netframework
+      tags: ((tags))
+    - get: ucmaruntime
+      tags: ((tags)) 
+    - get: vcredist11
+      tags: ((tags))  
+    - get: vcredist12
+      tags: ((tags))  
+  - task: install-exchange-prereqs
+    tags: ((tags))
+    image: dps-automation-image
+    file: labbuildr-concourse-tasks/vsphere/tasks/deploy-exchange-prereqs.yml
+    input_mapping:
+      labbuildr-concourse-tasks: labbuildr-concourse-tasks
+      labbuildr-scripts: labbuildr-scripts
+    params:
+      <<: *vsphere_env
+      LABBUILDR_SCRIPTS:
+        - node
+        - EXCHANGE
+      LABBUILDR_EXCHANGE_ISO: ((LABBUILDR.LAB1.EXCHANGESERVER2019_ISO))
+      LABBUILDR_EXCHANGE_CU: ((LABBUILDR.LAB1.EXCHANGESERVER2019_CU))
+      LABBUILDR_EXCHANGE_CU: ((LABBUILDR.LAB1.EXCHANGESERVER2019_CU))
 
 - name: delete-exchangenode
   plan:
@@ -242,4 +295,3 @@ jobs:
       labbuildr-concourse-tasks: labbuildr-concourse-tasks
     params:
       <<: *vsphere_env
-      LABBUILDR_VM_NAME: ((LABBUILDR.LAB1.EXCHANGE_FIRST_NODE.VMNAME))
