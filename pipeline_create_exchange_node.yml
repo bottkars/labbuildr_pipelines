@@ -121,8 +121,8 @@ jobs:
       labbuildr-concourse-tasks: labbuildr-concourse-tasks
     params:
       <<: *vsphere_env
-      LABBUILDR_VM_MEMORY: 8192
-      LABBUILDR_VM_CPU: 2
+      LABBUILDR_VM_MEMORY: 12288
+      LABBUILDR_VM_CPU: 4
       LABBUILDR_VM_TEMPLATE: ((LABBUILDR.LAB1.EXCHANGE_NODE.TEMPLATE))
 - name: generate-scripts-iso
   plan:
@@ -195,7 +195,7 @@ jobs:
         - node
         - E2019
       #ADDON_FEATURES: "RSAT-ADDS, RSAT-ADDS-TOOLS, AS-HTTP-Activation, NET-Framework-45-Features"  
-      ADDON_FEATURES: "Server-Media-Foundation, NET-Framework-45-Features, RPC-over-HTTP-proxy, RSAT-Clustering, RSAT-Clustering-CmdInterface, RSAT-Clustering-Mgmt, RSAT-Clustering-PowerShell, WAS-Process-Model, Web-Asp-Net45, Web-Basic-Auth, Web-Client-Auth, Web-Digest-Auth, Web-Dir-Browsing, Web-Dyn-Compression, Web-Http-Errors, Web-Http-Logging, Web-Http-Redirect, Web-Http-Tracing, Web-ISAPI-Ext, Web-ISAPI-Filter, Web-Lgcy-Mgmt-Console, Web-Metabase, Web-Mgmt-Console, Web-Mgmt-Service, Web-Net-Ext45, Web-Request-Monitor, Web-Server, Web-Stat-Compression, Web-Static-Content, Web-Windows-Auth, Web-WMI, Windows-Identity-Foundation, RSAT-ADDS"
+      ADDON_FEATURES: "Failover-Clustering, Server-Media-Foundation, NET-Framework-45-Features, RPC-over-HTTP-proxy, RSAT-Clustering, RSAT-Clustering-CmdInterface, RSAT-Clustering-Mgmt, RSAT-Clustering-PowerShell, WAS-Process-Model, Web-Asp-Net45, Web-Basic-Auth, Web-Client-Auth, Web-Digest-Auth, Web-Dir-Browsing, Web-Dyn-Compression, Web-Http-Errors, Web-Http-Logging, Web-Http-Redirect, Web-Http-Tracing, Web-ISAPI-Ext, Web-ISAPI-Filter, Web-Lgcy-Mgmt-Console, Web-Metabase, Web-Mgmt-Console, Web-Mgmt-Service, Web-Net-Ext45, Web-Request-Monitor, Web-Server, Web-Stat-Compression, Web-Static-Content, Web-Windows-Auth, Web-WMI, Windows-Identity-Foundation, RSAT-ADDS"
 - name: unjoin-domain
   plan:
   - in_parallel:
@@ -292,6 +292,32 @@ jobs:
     tags: ((tags))
     image: dps-automation-image
     file: labbuildr-concourse-tasks/vsphere/tasks/deploy-exchange.yml
+    input_mapping:
+      labbuildr-concourse-tasks: labbuildr-concourse-tasks
+      labbuildr-scripts: labbuildr-scripts
+    params:
+      <<: *vsphere_env
+      LABBUILDR_SCRIPTS:
+        - node
+        - EXCHANGE
+      LABBUILDR_EXCHANGE_ISO: ((LABBUILDR.LAB1.EXCHANGESERVER2019_ISO))
+      LABBUILDR_EXCHANGE_CU: ((LABBUILDR.LAB1.EXCHANGESERVER2019_CU))
+
+- name: configure-exchange
+  plan:
+  - in_parallel:
+    - get: dps-automation-image
+    - get: one-time-trigger
+      passed:
+      - deploy-exchange
+      trigger: true      
+      tags: ((tags))        
+    - get: labbuildr-concourse-tasks
+      tags: ((tags))
+  - task: configure-exchange
+    tags: ((tags))
+    image: dps-automation-image
+    file: labbuildr-concourse-tasks/vsphere/tasks/configure-exchange.yml
     input_mapping:
       labbuildr-concourse-tasks: labbuildr-concourse-tasks
       labbuildr-scripts: labbuildr-scripts
