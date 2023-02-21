@@ -1,52 +1,57 @@
 {
-    "builders": [
+  "builders": [
+    {
+      "CPUs": 2,
+      "RAM": 8192,
+      "RAM_reserve_all": true,
+      "communicator": "winrm",
+      "convert_to_template": true,
+      "datastore": "{{user `datastore`}}",
+      "disk_controller_type": "pvscsi",
+      "floppy_files": [
+        "{{template_dir}}/scripts/2022",
+        "{{template_dir}}/answerfiles/{{user `edition`}}"
+      ],
+      "floppy_img_path": "{{user `floppy_img`}}",
+      "guest_os_type": "windows9Server64Guest",
+      "host": "{{user `host`}}",
+      "insecure_connection": "true",
+      "iso_paths": [
+        "{{user `win_iso`}}",
+        "{{user `tools_iso`}}"
+      ],
+      "name": "{{user `builder_name`}}",
+      "network_adapters": [
         {
-            "winrm_timeout": "1h",
-            "shutdown_timeout": "1h",
-            "name": "{{user `builder_name`}}",
-            "type": "vsphere-iso",
-            "vcenter_server": "{{user `vcenter_server`}}",
-            "username": "{{user `username`}}",
-            "password": "{{user `password`}}",
-            "insecure_connection": "true",
-            "vm_name": "{{user `vm_name`}}",
-            "host": "{{user `host`}}",
-            "resource_pool": "{{user `resource_pool`}}",
-            "datastore": "{{user `datastore`}}",
-            "guest_os_type": "windows9Server64Guest",
-            "communicator": "winrm",
-            "winrm_username": "administrator",
-            "winrm_password": "packer",
-            "shutdown_command": "C:/Windows/System32/WindowsPowerShell/v1.0/powershell.exe -File a:/sysprep.ps1",
-            "CPUs": 2,
-            "RAM": 8192,
-            "RAM_reserve_all": true,
-            "disk_controller_type": "pvscsi",
-            "disk_size": 32768,
-            "disk_thin_provisioned": true,
-            "network_adapters": [
-                {
-                    "network_card": "vmxnet3",
-                    "network": "{{user `network`}}"
-                }
-            ],
-            "iso_paths": [
-                "{{user `win_iso`}}",
-                "{{user `tools_iso`}}"
-            ],
-            "floppy_files": [
-                "{{template_dir}}/scripts/2019",
-                "{{template_dir}}/answerfiles/2019"
-            ],
-            "floppy_img_path": "{{user `floppy_img`}}"
+          "network": "{{user `network`}}",
+          "network_card": "vmxnet3"
         }
-    ],
-    "provisioners": [
+      ],
+      "password": "{{user `password`}}",
+      "resource_pool": "{{user `resource_pool`}}",
+      "shutdown_command": "a:/sysprep.bat",
+      "shutdown_timeout": "1h",
+      "storage": [
         {
-            "inline": [
-                "dir c:\\"
-            ],
-            "type": "windows-shell"
+          "disk_size": 32768,
+          "disk_thin_provisioned": true
         }
-    ]
+      ],
+      "type": "vsphere-iso",
+      "username": "{{user `username`}}",
+      "vcenter_server": "{{user `vcenter_server`}}",
+      "vm_name": "{{user `vm_name`}}",
+      "winrm_password": "packer",
+      "winrm_timeout": "1h",
+      "winrm_username": "administrator"
+    }
+  ],
+  "provisioners": [
+    {
+      "inline": [
+        "dir c:\\"
+      ],
+      "type": "windows-shell"
+    }
+  ]
 }

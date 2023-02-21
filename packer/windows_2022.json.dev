@@ -1,0 +1,52 @@
+{
+    "builders": [
+        {
+            "winrm_timeout": "1h",
+            "shutdown_timeout": "1h",
+            "name": "{{user `builder_name`}}",
+            "type": "vsphere-iso",
+            "vcenter_server": "{{user `vcenter_server`}}",
+            "username": "{{user `username`}}",
+            "password": "{{user `password`}}",
+            "insecure_connection": "true",
+            "vm_name": "{{user `vm_name`}}",
+            "host": "{{user `host`}}",
+            "resource_pool": "{{user `resource_pool`}}",
+            "datastore": "{{user `datastore`}}",
+            "guest_os_type": "windows9Server64Guest",
+            "communicator": "winrm",
+            "winrm_username": "administrator",
+            "winrm_password": "packer",
+            "shutdown_command": "C:/Windows/System32/WindowsPowerShell/v1.0/powershell.exe -File a:/sysprep.ps1",
+            "CPUs": 2,
+            "RAM": 8192,
+            "RAM_reserve_all": true,
+            "disk_controller_type": "pvscsi",
+            "disk_size": 32768,
+            "disk_thin_provisioned": true,
+            "network_adapters": [
+                {
+                    "network_card": "vmxnet3",
+                    "network": "{{user `network`}}"
+                }
+            ],
+            "iso_paths": [
+                "{{user `win_iso`}}",
+                "{{user `tools_iso`}}"
+            ],
+            "floppy_files": [
+                "{{template_dir}}/scripts/2022",
+                "{{template_dir}}/answerfiles/2022"
+            ],
+            "floppy_img_path": "{{user `floppy_img`}}"
+        }
+    ],
+    "provisioners": [
+        {
+            "inline": [
+                "dir c:\\"
+            ],
+            "type": "windows-shell"
+        }
+    ]
+}
