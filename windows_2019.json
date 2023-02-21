@@ -13,7 +13,7 @@
             "host": "{{user `host`}}",
             "resource_pool": "{{user `resource_pool`}}",
             "datastore": "{{user `datastore`}}",
-            "guest_os_type": "windows9Server64Guest",
+            "guest_os_type": "windows2019srvNext-64",
             "communicator": "winrm",
             "winrm_username": "administrator",
             "winrm_password": "packer",
