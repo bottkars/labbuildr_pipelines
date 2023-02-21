@@ -3,7 +3,7 @@
         {
             "winrm_timeout": "1h",
             "shutdown_timeout": "1h",
-            "name": "{{user `builder_name`}}",    
+            "name": "{{user `builder_name`}}",
             "type": "vsphere-iso",
             "vcenter_server": "{{user `vcenter_server`}}",
             "username": "{{user `username`}}",
@@ -43,26 +43,10 @@
     ],
     "provisioners": [
         {
-            "type": "powershell",
-            "inline":[
-                "$Updates=Start-WUScan",
-                "if ($Updates) {Install-WUUpdates -updates $Updates} else {Write-Host '==> no pending updates'}",
-                "if (Get-WUIsPendingReboot) {write-host 'pending reboot<==';Restart-computer -Force} else {Write-Host '==>No Reboot Required<=='}"
-
-            ]
-        },
-        {
-            "type": "powershell",
             "inline": [
-                "if (Get-WUIsPendingReboot) {write-host 'pending reboot<==';Restart-Computer -Force} else {Write-Host '==>No Reboot Required<=='}"
-            ]
-        },
-        {
-            "type": "powershell",
-            "inline": [
-                "if (Get-WUIsPendingReboot) {write-host 'pending reboot<==';Restart-Computer -Force} else {Write-Host '==>No Reboot Required<=='}"
-            ]
-
+                "dir c:\\"
+            ],
+            "type": "windows-shell"
         }
     ]
 }

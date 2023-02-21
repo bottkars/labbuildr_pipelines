@@ -3,6 +3,13 @@ $NetworkListManager = [Activator]::CreateInstance([Type]::GetTypeFromCLSID([Guid
 $Connections = $NetworkListManager.GetNetworkConnections()
 $Connections | ForEach-Object { $_.GetNetwork().SetCategory(1) }
 
+#Install PS Windows Update Module
+
+Get-PackageProvider -name nuget -force
+Install-Module PSWindowsUpdate -confirm:$false -force
+Get-WindowsUpdate -MicrosoftUpdate -install -IgnoreUserInput -acceptall -AutoReboot | Out-File -filepath 'c:\windowsupdate.log' -append
+
+
 Enable-PSRemoting -Force
 winrm quickconfig -q
 winrm quickconfig -transport:http
