@@ -1,0 +1,50 @@
+s3_env: &s3_env
+  access_key_id: ((((foundation))/s3_access_key_id))
+  endpoint:  ((((foundation))/s3_endpoint))
+  region_name: ((((foundation))/s3_region_name))
+  secret_access_key: ((((foundation))/s3_secret_access_key))
+
+resource_types:
+- name: packer
+  type: docker-image
+  source:
+    repository: snapkitchen/concourse-packer-resource
+    tag: 1.6.2
+
+resources:
+- name: build-vsphere-server-((WINDOWS_VERSION))-((EDITION))
+  icon: server-plus
+  tags: ((tags))
+  type: packer
+
+- name: labbuildr-pipelines
+  tags: ((tags))
+  icon: github
+  type: git  
+  source: 
+    uri: https://github.com/bottkars/labbuildr_pipelines.git
+    branch: master
+
+jobs:
+- name: build-vsphere
+  plan:
+  - get: labbuildr-pipelines
+  - put: build-vsphere-server-((WINDOWS_VERSION))-((EDITION))
+    params:
+      force: true
+      debug: true
+      template: labbuildr-pipelines/packer/windows_2019.json
+      vars:
+        builder_name: vsphere-iso-build #vsphere-update-build
+        vcenter_server: ((GOVC.URL))
+        username: ((GOVC.USERNAME))
+        password: ((GOVC.PASSWORD))
+        vm_name: SERVER((WINDOWS_VERSION))((LABBUILDR.PACKER_TEMPLATE.SERVER.EDITION))_TEMPLATE
+        edition: SERVER((WINDOWS_VERSION))((LABBUILDR.PACKER_TEMPLATE.SERVER.EDITION))
+        host: ((LABBUILDR.PACKER_TEMPLATE.HOST))
+        resource_pool: ((LABBUILDR.PACKER_TEMPLATE.RESOURCE_POOL))
+        datastore: ((LABBUILDR.PACKER_TEMPLATE.DATASTORE))
+        network: ((LABBUILDR.PACKER_TEMPLATE.NETWORK))
+        win_iso: ((LABBUILDR.PACKER_TEMPLATE.SERVER.ISO))
+        tools_iso: ((LABBUILDR.PACKER_TEMPLATE.VMWARE_TOOLS_ISO.WINDOWS))
+        floppy_img: ((LABBUILDR.PACKER_TEMPLATE.VMWARE_FLOPPY_IMG.WINDOWS))
