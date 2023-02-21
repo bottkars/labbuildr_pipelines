@@ -14,7 +14,6 @@
       ],
       "floppy_img_path": "{{user `floppy_img`}}",
       "guest_os_type": "windows2019srvNext-64",
-      "version": 19,
       "host": "{{user `host`}}",
       "insecure_connection": "true",
       "iso_paths": [
