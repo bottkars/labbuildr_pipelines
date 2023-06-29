@@ -147,7 +147,7 @@
                 <SynchronousCommand wcm:action="add">
                     <Order>2</Order>
                     <Description>Install VMware Tools</Description>
-                    <CommandLine>e:\setup64 /s /v "/qb REBOOT=R"</CommandLine>
+                    <CommandLine>e:\setup64 /s /v "/qn reboot=ReallySuppress"</CommandLine>
                     <RequiresUserInput>true</RequiresUserInput>
                 </SynchronousCommand> 
                 <SynchronousCommand wcm:action="add">
