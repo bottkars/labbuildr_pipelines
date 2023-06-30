@@ -34,8 +34,7 @@
       "storage": [
         {
           "disk_size": 32768,
-          "disk_thin_provisioned": true,
-          "disk_type_id": 5
+          "disk_thin_provisioned": true
         }
       ],
       "type": "vsphere-iso",
