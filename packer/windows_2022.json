@@ -8,7 +8,6 @@
       "convert_to_template": true,
       "datastore": "{{user `datastore`}}",
       "disk_controller_type": "pvscsi",
-      "disk_type_id": 5,
       "floppy_files": [
         "{{template_dir}}/scripts/2022",
         "{{template_dir}}/answerfiles/{{user `edition`}}"
@@ -35,7 +34,8 @@
       "storage": [
         {
           "disk_size": 32768,
-          "disk_thin_provisioned": true
+          "disk_thin_provisioned": true,
+          "disk_type_id": 5
         }
       ],
       "type": "vsphere-iso",
