@@ -69,7 +69,7 @@
                     <!-- Do not uncomment the Key element if you are using trial ISOs -->
                     <!-- You must uncomment the Key element (and optionally insert your own key) if you are using retail or volume license ISOs -->
                     <Key>JN4MH-YP8KT-3GFFJ-VF3JK-9HM4V</Key>
-                    <WillShowUI>OnError</WillShowUI>
+                    <WillShowUI>Never</WillShowUI>
                 </ProductKey>
                 <AcceptEula>true</AcceptEula>
                 <FullName>labbuildr</FullName>
@@ -149,7 +149,7 @@
                     <Description>Install VMware Tools</Description>
                     <CommandLine>e:\setup64 /s /v "/qb REBOOT=R"</CommandLine>
                     <RequiresUserInput>true</RequiresUserInput>
-                </SynchronousCommand> 
+                </SynchronousCommand>               
                 <SynchronousCommand wcm:action="add">
                     <Order>3</Order>
                     <Description>Disable WinRM</Description>
