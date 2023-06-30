@@ -92,13 +92,11 @@
             <EnableLUA>false</EnableLUA>
         </component>
     </settings>
-<!--
     <settings pass="generalize">
         <component name="Microsoft-Windows-Security-SPP" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS" xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-            <SkipRearm>0</SkipRearm>
+            <SkipRearm>1</SkipRearm>
         </component>
     </settings>
--->
     <settings pass="specialize">
         <component name="Microsoft-Windows-International-Core" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS" xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
             <InputLocale>0c09:00000409</InputLocale>
