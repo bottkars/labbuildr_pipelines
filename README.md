@@ -1,5 +1,5 @@
 # labbuildr_pipelines
-
+fly -t asdk set-pipeline -p create-2022-template -c  $HOME/workspace/labbuildr_pipelines/pipeline_create_win_packer.yml -l $HOME/workspace/dpslab_labbuildr_local/vars_powerprotect.yml --var EDITION=desktop --var=WINDOWS_VERSION=2022
 
 #create template servercore
 ```
