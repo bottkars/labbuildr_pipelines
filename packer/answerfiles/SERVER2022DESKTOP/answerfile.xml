@@ -99,7 +99,7 @@
             <PersistAllDeviceInstalls>false</PersistAllDeviceInstalls>
         </component>
     </settings>
-    <settings pass="windowsPE">
+<!--    <settings pass="windowsPE">
         <component name="Microsoft-Windows-Setup" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS" xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
             <UserData>
                 <ProductKey>
@@ -108,6 +108,6 @@
                 </ProductKey>
             </UserData>
         </component>
-    </settings>
+    </settings> -->
     <cpi:offlineImage cpi:source="wim:d:/wimfiles/2016/install.wim#Windows Server 2016 SERVERDATACENTER" xmlns:cpi="urn:schemas-microsoft-com:cpi" />
 </unattend>
