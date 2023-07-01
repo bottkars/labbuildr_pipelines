@@ -24,6 +24,7 @@
                 <Enabled>true</Enabled>
                 <Username>Administrator</Username>
             </AutoLogon>
+            <ProductKey>JN4MH-YP8KT-3GFFJ-VF3JK-9HM4V</ProductKey>
             <RegisteredOrganization>labbuildr2023 image 30/06/2023</RegisteredOrganization>
             <ShowWindowsLive>false</ShowWindowsLive>         
         </component>
