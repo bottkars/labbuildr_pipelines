@@ -116,7 +116,7 @@
         </component>
         <component name="Microsoft-Windows-Shell-Setup" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS" xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
             <ComputerName>template</ComputerName>
-            <!--<Key>N2KJX-J94YW-TQVFB-DG9YT-724CC</Key>-->
+            <ProductKey>JN4MH-YP8KT-3GFFJ-VF3JK-9HM4V</ProductKey>
         </component>
     </settings>
     <settings pass="specialize">

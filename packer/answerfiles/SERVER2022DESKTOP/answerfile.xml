@@ -25,13 +25,7 @@
                 <Username>Administrator</Username>
             </AutoLogon>
             <RegisteredOrganization>labbuildr2023 image 30/06/2023</RegisteredOrganization>
-            <ShowWindowsLive>false</ShowWindowsLive>
-            <UserData>
-                <ProductKey>
-                    <WillShowUI>Never</WillShowUI>
-                    <Key>JN4MH-YP8KT-3GFFJ-VF3JK-9HM4V</Key>
-                </ProductKey>
-            </UserData>            
+            <ShowWindowsLive>false</ShowWindowsLive>         
         </component>
     </settings>
     <settings pass="oobeSystem">
@@ -97,7 +91,7 @@
             <PersistAllDeviceInstalls>false</PersistAllDeviceInstalls>
         </component>
     </settings>
-<!--    <settings pass="windowsPE">
+    <settings pass="windowsPE">
         <component name="Microsoft-Windows-Setup" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS" xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
             <UserData>
                 <ProductKey>
@@ -106,6 +100,6 @@
                 </ProductKey>
             </UserData>
         </component>
-    </settings> -->
+    </settings>
     <cpi:offlineImage cpi:source="wim:d:/wimfiles/2016/install.wim#Windows Server 2016 SERVERDATACENTER" xmlns:cpi="urn:schemas-microsoft-com:cpi" />
 </unattend>
