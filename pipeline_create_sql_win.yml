@@ -211,7 +211,7 @@ jobs:
       LABBUILDR_SCRIPTS:
         - node
         - SQL
-      LABBUILDR_SQL_ISO: ((LABBUILDR.LAB1.SQLSERVER2019_ISO))
+      LABBUILDR_SQL_ISO: ((LABBUILDR.LAB1.SQLSERVER2022_ISO))
 
 - name: delete-sqlnode
   plan:
